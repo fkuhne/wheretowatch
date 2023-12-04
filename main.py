@@ -4,6 +4,8 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.agents import load_tools
 from langchain.agents import initialize_agent
+from langchain.tools import DuckDuckGoSearchResults, Tool
+
 from dotenv import load_dotenv
 import streamlit as st
 
@@ -16,7 +18,18 @@ llm = OpenAI(temperature = 0)
 
 # )
 
-tools = load_tools(["serpapi"], llm=llm)
+ddg_search = DuckDuckGoSearchResults()
+# Load the tool configs that are needed.
+tools = [
+    Tool.from_function(
+        func=ddg_search.run,
+        name="Search",
+        description="useful for when you need to answer questions about current events",
+        # coroutine= ... <- you can specify an async method if desired as well
+    ),
+]
+
+# tools = load_tools(tools, llm=llm)
 
 prompt = PromptTemplate(
     input_variables=['country','title'],
