@@ -1,5 +1,5 @@
 from langchain.llms import OpenAI
-from langchain.llms import HuggingFaceHub
+# from langchain.llms import HuggingFaceHub
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.agents import load_tools
@@ -9,12 +9,12 @@ import streamlit as st
 
 load_dotenv()
 
-# llm = OpenAI(temperature = 0)
-llm = HuggingFaceHub(
-    repo_id="meta-llama/Llama-2-70b-hf",
-    model_kwargs={"temperature": 0},
+llm = OpenAI(temperature = 0)
+# llm = HuggingFaceHub(
+#     repo_id="meta-llama/Llama-2-70b-hf",
+#     model_kwargs={"temperature": 0},
 
-)
+# )
 
 tools = load_tools(["serpapi"], llm=llm)
 
@@ -58,7 +58,7 @@ color: '#f0f0f0';
 st.header('📺🍿 Where To Watch?')
 st.divider()
 title = st.text_input('What is the name of the show?', 'Life of Brian')
-country = st.text_input('In which country?', 'Croatia')
+country = st.text_input('In which country?', 'Brazil')
 question = prompt.format(country=country, title=title)
 st.markdown(footer,unsafe_allow_html=True)
 if st.button('Search'):
