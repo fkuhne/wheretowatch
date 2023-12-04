@@ -1,8 +1,5 @@
 from langchain.llms import OpenAI
-# from langchain.llms import HuggingFaceHub
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain.agents import load_tools
 from langchain.agents import initialize_agent
 from langchain.tools import DuckDuckGoSearchResults, Tool
 
@@ -28,8 +25,6 @@ tools = [
         # coroutine= ... <- you can specify an async method if desired as well
     ),
 ]
-
-# tools = load_tools(tools, llm=llm)
 
 prompt = PromptTemplate(
     input_variables=['country','title'],
@@ -64,7 +59,7 @@ color: '#f0f0f0';
 }
 </style>
 <div class="footer">
-<p>Made by <a href="https://https://github.com/fkuhne" target="_blank">fkuhne</a>.</p>
+<p>Made by <a href="https://github.com/fkuhne" target="_blank">fkuhne</a>.</p>
 </div>
 """
 
