@@ -71,5 +71,12 @@ question = prompt.format(country=country, title=title)
 st.markdown(footer,unsafe_allow_html=True)
 if st.button('Search'):
     with st.spinner('Searching...'):
-        answer = agent.run(question)
-        st.write("**{answer}**".format(answer=answer))
+        try:
+            answer = agent.run(question)
+            st.write("🟢 **{answer}**".format(answer=answer))
+        except Exception as e:
+            st.write("⚠️ We're a little busy crafting byte-sized popcorn insights 😣. Try again in a bit!")
+            exception_type = type(e).__name__
+            st.error("Exception type: {}".format(exception_type))
+
+
