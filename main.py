@@ -3,7 +3,8 @@ from langchain.prompts import PromptTemplate
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from langchain.tools import Tool
-from langchain.utilities import GoogleSearchAPIWrapper
+# from langchain.utilities import GoogleSearchAPIWrapper
+from langchain.agents import load_tools
 
 from dotenv import load_dotenv
 import streamlit as st
@@ -24,15 +25,16 @@ If you don't know or couldn't find the answer, say 'Sorry, but I don't know'.
 
 llm = OpenAI(temperature = 0)
 
-search = GoogleSearchAPIWrapper()
-tool = Tool(
-    name="Google search",
-    description="Search Google for recent results.",
-    func=search.run,
-)
+# search = GoogleSearchAPIWrapper()
+# tool = Tool(
+#     name="Google search",
+#     description="Search Google for recent results.",
+#     func=search.run,
+# )
+tools = load_tools(["google-search"])
 
 agent = initialize_agent(
-    [tool],
+    tools,
     llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     handle_parsing_errors=True,
