@@ -38,7 +38,7 @@ agent = initialize_agent(
     llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     handle_parsing_errors=True,
-    verbose=True
+    verbose=False
 )
 
 st.header('📺🍿 Where To Watch?')
