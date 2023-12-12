@@ -1,82 +1,66 @@
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.agents import initialize_agent
-from langchain.tools import DuckDuckGoSearchResults, Tool
+from langchain.agents import AgentType
+from langchain.tools import Tool
+from langchain.utilities import GoogleSearchAPIWrapper
 
 from dotenv import load_dotenv
 import streamlit as st
 
 load_dotenv()
 
-llm = OpenAI(temperature = 0)
-# llm = HuggingFaceHub(
-#     repo_id="meta-llama/Llama-2-70b-hf",
-#     model_kwargs={"temperature": 0},
-
-# )
-
-ddg_search = DuckDuckGoSearchResults()
-# Load the tool configs that are needed.
-tools = [
-    Tool.from_function(
-        func=ddg_search.run,
-        name="Search",
-        description="useful for when you need to answer questions about current events",
-        # coroutine= ... <- you can specify an async method if desired as well
-    ),
-]
-
 prompt = PromptTemplate(
     input_variables=['country','title'],
-    template="""Consider that I want to watch a show in {country}. Look in TV
-channels and streaming services and answer me in which channel this show is
-airing: {title}. Before giving back the answer, make sure it is correct. But
-more importantly, if you don't know the answer, just say 'Sorry, but I don't know'."""
+    template="""I am in {country} and want to watch the show {title} on TV.
+Please, search really hard throughout the Internet and answer me where {title}
+is currently airing. Use only TV channels or streaming services like, for
+example, HBO, Netflix, Apple TV and so on, and disregard everything else.
+Disregard any information about the show being available in another country
+other than {country}. Before giving back the answer, make sure it is correct.
+If you don't know or couldn't find the answer, say 'Sorry, but I don't know'.
+"""
 )
 
-agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=False)
+llm = OpenAI(temperature = 0)
 
-footer="""<style>
-a:link , a:visited{
-color: blue;
-background-color: transparent;
-text-decoration: underline;
-}
+search = GoogleSearchAPIWrapper()
+tool = Tool(
+    name="Google search",
+    description="Search Google for recent results.",
+    func=search.run,
+)
 
-a:hover,  a:active {
-color: red;
-background-color: transparent;
-text-decoration: underline;
-}
-
-.footer {
-position: fixed;
-left: 0;
-bottom: 0;
-width: 100%;
-text-align: center;
-color: '#f0f0f0';
-}
-</style>
-<div class="footer">
-<p>Made by <a href="https://github.com/fkuhne" target="_blank">fkuhne</a>.</p>
-</div>
-"""
+agent = initialize_agent(
+    [tool],
+    llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    handle_parsing_errors=True,
+    verbose=True
+)
 
 st.header('📺🍿 Where To Watch?')
 st.divider()
-title = st.text_input('What is the name of the show?', 'Life of Brian')
+title = st.text_input('What is the name of the show?')
 country = st.text_input('In which country?', 'Brazil')
 question = prompt.format(country=country, title=title)
-st.markdown(footer,unsafe_allow_html=True)
 if st.button('Search'):
     with st.spinner('Searching...'):
         try:
             answer = agent.run(question)
-            st.write("🟢 **{answer}**".format(answer=answer))
+            st.info("🟢 **{answer}**".format(answer=answer))
         except Exception as e:
             st.write("⚠️ We're a little busy crafting byte-sized popcorn insights 😣. Try again in a bit!")
             exception_type = type(e).__name__
             st.error("Exception type: {}".format(exception_type))
 
-
+st.divider()
+st.markdown("""⚠️ *:gray[Please note that this is an experimental project.  
+You may face quota/rate limit warnings from Google or OpenAI cloud services.]*""")
+st.divider()
+st.markdown(
+    """<div style="text-align: center; color: gray">
+        Made by <a href="https://github.com/fkuhne" target="_blank">fkuhne</a>.
+    </div>""",
+    unsafe_allow_html=True
+)
