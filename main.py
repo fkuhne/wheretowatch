@@ -25,12 +25,6 @@ If you don't know or couldn't find the answer, say 'Sorry, but I don't know'.
 
 llm = OpenAI(temperature = 0)
 
-# search = GoogleSearchAPIWrapper()
-# tool = Tool(
-#     name="Google search",
-#     description="Search Google for recent results.",
-#     func=search.run,
-# )
 tools = load_tools(["google-search"])
 
 agent = initialize_agent(
@@ -43,6 +37,7 @@ agent = initialize_agent(
 
 st.header('📺🍿 Where To Watch?')
 st.divider()
+st.warning('I’ve run out of credits for OpenAI API and your search will not work until I refill it.', icon="⚠️")
 title = st.text_input('What is the name of the show?')
 country = st.text_input('In which country?', 'Brazil')
 question = prompt.format(country=country, title=title)
